@@ -6,7 +6,7 @@ From screeshots in real time, the bot is meant to analyze what is on screen and 
 
 ## Requirements
 
-Using Python, this project requires to have as pip package:
+Using Python, this project requires to have as pip packages:
 - numpy
 - opencv-python
 - Pillow
@@ -14,5 +14,5 @@ Using Python, this project requires to have as pip package:
 
 ## References
 
-The computer vision part is based on the [Youtube playlist of "Learn Code by Gaming"](https://youtube.com/playlist?list=PL1m2M8LQlzfKtkKq2lK5xko4X-8EZzFPI)
+The computer vision part is based on the [Youtube playlist of "Learn Code by Gaming"](https://youtube.com/playlist?list=PL1m2M8LQlzfKtkKq2lK5xko4X-8EZzFPI).
 Plus, online help links can be found in the code.
