@@ -3,6 +3,8 @@ import cv2 as cv
 # opencv doc : https://docs.opencv.org/4.5.3/index.html
 from hsv_filter import HsvFilter
 
+CELL_WIDTH_IN_PIXELS = 72
+CELL_HEIGHT_IN_PIXELS = 72
 
 class Vision:
 
@@ -50,9 +52,9 @@ class Vision:
         for loc in locations:
             rect = [int(loc[0]), int(loc[1]), self.needle_width, self.needle_height]
             # Add every box to the list twice in order to retain single (non-overlapping) boxes
+            rectangles.append(rect)
             if len(rectangles) == 1:
                 rectangles.append(rect)
-            rectangles.append(rect)
 
         # Apply group rectangles
         # The groupThreshold parameter should usually be 1.
@@ -62,63 +64,12 @@ class Vision:
         # "Relative difference between sides of the rectangles to merge them into a group"
         rectangles, weights = cv.groupRectangles(rectangles, groupThreshold=1, eps=0.5)
 
-        if len(rectangles) > max_results:
-            print("Warning: too many results, raise the threshold")
+        if len(rectangles) >= max_results:
+            print("Warning: too many results: "+ str(len(rectangles)) + ", raise the threshold")
             rectangles = rectangles[:max_results]
 
         return rectangles
 
-
-    '''
-        Convert rectangles into a list of [x, y] positions being the center of the rectangles
-        @param given a list of [x, y, w, h] rectangles
-    '''
-    def get_centers_of_rectangles(self, rectangles):
-        points = []
-        # Loop over all the locations and draw their rectangle
-        for (x, y, w, h) in rectangles:
-            # Determine the center position
-            center_x = x + int(w/2)
-            center_y = y + int(h/2)
-            # Save the points
-            points.append((center_x, center_y))
-
-        return points
-
-
-    '''
-        Return the canvas with the rectangles drawn on it
-        @param : rectangles is a list of [x, y, w, h] rectangles
-    '''
-    def draw_rectangles(self, canvas, rectangles, line_color=None):
-        # the BGR color
-        if line_color is None:
-            line_color = (0, 255, 0)
-        line_type = cv.LINE_4
-
-        # Loop over all the locations and draw their rectangle
-        for (x, y, w, h) in rectangles:
-            top_left = (x, y)
-            bottom_right = (x + w, y + h)
-            # Draw the boxes
-            cv.rectangle(canvas, top_left, bottom_right, color=line_color, thickness=2, lineType=line_type)
-            
-        return canvas
-
-
-    '''
-        Return the canvas with a crosshair at the points' position
-        @param points is a list of [x, y] positions
-    '''
-    def draw_crosshairs(self, canvas, points):
-        # the BGR color
-        marker_color = (255, 0, 255)
-        marker_type = cv.MARKER_CROSS
-
-        for (center_x, center_y) in points:
-            cv.drawMarker(canvas, (center_x, center_y), marker_color, marker_type)
-
-        return canvas
 
     # Create a GUI window with controls for adjusting arguments in real time
     def init_control_gui(self):
@@ -149,6 +100,7 @@ class Vision:
         cv.createTrackbar("VAdd", self.TRACKBAR_WINDOW, 0, 255, nothing)
         cv.createTrackbar("VSub", self.TRACKBAR_WINDOW, 0, 255, nothing)
 
+
     # Return the HSV min and max values of the control GUI 
     def get_hsv_filter_from_controls(self):
         hsv_filter = HsvFilter()
@@ -163,6 +115,7 @@ class Vision:
         hsv_filter.vAdd = cv.getTrackbarPos('VAdd', self.TRACKBAR_WINDOW)
         hsv_filter.vSub = cv.getTrackbarPos('VSub', self.TRACKBAR_WINDOW)
         return hsv_filter
+
 
     # Apply the filter on the image and return the image
     def apply_hsv_filter(self, original_image, hsv_filter=None):
@@ -193,9 +146,67 @@ class Vision:
         img = cv.cvtColor(result, cv.COLOR_HSV2BGR)
 
         return img
+    
+    # STATIC FUNCTIONS
+    '''
+        Convert rectangles into a list of [x, y] positions being the center of the rectangles
+        @param given a list of [x, y, w, h] rectangles
+    '''
+    @staticmethod
+    def get_centers_of_rectangles(rectangles):
+        points = []
+        # Loop over all the locations and draw their rectangle
+        for (x, y, w, h) in rectangles:
+            # Determine the center position
+            center_x = x + int(w/2)
+            center_y = y + int(h/2)
+            # Save the points
+            points.append((center_x, center_y))
+
+        return points
+
+
+    '''
+        Return the canvas with the rectangles drawn on it
+        @param : rectangles is a list of [x, y, w, h] rectangles
+    '''
+    @staticmethod
+    def draw_rectangles(canvas, rectangles, line_color=None):
+        # the BGR color
+        if line_color is None:
+            line_color = (0, 255, 0)
+        line_type = cv.LINE_4
+
+        # Loop over all the locations and draw their rectangle
+        for (x, y, w, h) in rectangles:
+            top_left = (x, y)
+            bottom_right = (x + w, y + h)
+            # Draw the boxes
+            cv.rectangle(canvas, top_left, bottom_right, color=line_color, thickness=2, lineType=line_type)
+            
+        return canvas
+
+
+    '''
+        Return the canvas with a crosshair at the points' position
+        @param points is a list of [x, y] positions
+    '''
+    @staticmethod
+    def draw_crosshairs(canvas, points, marker_color=None):
+        # the BGR color
+        if marker_color is None:
+            marker_color = (255, 0, 255)
+        marker_type = cv.MARKER_CROSS
+
+        for (center_x, center_y) in points:
+            cv.drawMarker(canvas, (center_x, center_y), marker_color, marker_type)
+
+        return canvas
+
 
     # Adjust HSV channels
-    def shift_channel(self, c, amount):
+    @staticmethod
+    def shift_channel(c, amount):
         if amount > 0:
             lim = 255 - amount
             c[c >= lim] = 255
