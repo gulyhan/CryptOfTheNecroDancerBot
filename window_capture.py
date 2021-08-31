@@ -1,9 +1,14 @@
 import numpy as np
-
+from threading import Thread, Lock
 # Screenshot
 import win32gui, win32ui, win32con
 
 class WindowCapture:
+    # Thread attribut
+    stopped = True
+    lock = None
+    screenshot = None
+
     # Monitor width and height
     w = 0
     h = 0
@@ -14,6 +19,8 @@ class WindowCapture:
     offset_y = 0
 
     def __init__(self, window_name=None):
+        self.lock = Lock()
+
         if window_name is None:
             self.hwnd = win32gui.GetDesktopWindow()
         else:
@@ -102,6 +109,27 @@ class WindowCapture:
     def get_game_resolution(self):
         return (self.w, self.h)
     
+
+    # THREAD METHODS
+    def start(self):
+        self.stopped = False
+        t = Thread(target=self.run)
+        t.start()
+
+    def stop(self):
+        self.stopped = True
+
+
+    def run(self):
+        # TODO: while loop can be slowed down
+        while not self.stopped:
+            screenshot = self.get_screenshot()
+            # lock the thread while updating the result
+            self.lock.acquire()
+            self.screenshot = screenshot
+            self.lock.release()
+    
+
     # STATIC METHODS  
     @staticmethod
     def show_window_names():

@@ -23,7 +23,8 @@ class GameMap:
     width = 0
     height = 0
     board = None
-
+    character_position = None
+    stairs_position = None
 
     def __init__(self, width=GAME_MAP_WIDTH_IN_CELLS, height=GAME_MAP_HEIGHT_IN_CELLS):
         self.width = width
@@ -32,8 +33,8 @@ class GameMap:
 
     
     def __str__(self):
-        result = "(" + str(self.width) + "," + str(self.height) + ")\n"
-        result += "  "
+        #result = "(" + str(self.width) + "," + str(self.height) + ")\n"
+        result = "  "
         for _ in range(6):
             result += " "
         result += "⑤"
@@ -65,14 +66,35 @@ class GameMap:
         return result
 
 
+    def getWidth(self):
+        return self.width
+
+    
+    def getHeight(self):
+        return self.height
+
+
     # Return the Cell at the position, a (x, y) tuple
     def getCell(self, position):
         return self.board[position[1]][position[0]]
 
 
+    def getCharacterPosition(self):
+        return self.character_position
+
+
+    def getStairsPosition(self):
+        return self.stairs_position
+
+
     def setCell(self, position, cell):
         self.board[position[1]][position[0]] = cell
 
+
+    # Return true if the position in the bounds of the board
+    def isInBounds(self, position):
+        return 0 <= position[0] < self.width and 0 <= position[1] < self.height
+    
 
     '''Convert the position of a pixel in a game screenshot to a cell position representing the game
     @param pixel_position a (x, y) tuple
@@ -87,6 +109,7 @@ class GameMap:
 
     # Set the content of all cells at Cell.EMPTY
     def clearCells(self):
+        self.character_position = None
         # self.board = [[Cell.EMPTY] * self.width] * self.height
         self.board = []
         for y in range(self.height):
@@ -104,3 +127,7 @@ class GameMap:
             game_resolution = window_capture.get_game_resolution()
             cell_pos = self.convertPixelPositionToCellPosition(center, game_resolution)
             self.setCell(cell_pos, cell_content)
+            if cell_content == Cell.CHARACTER:
+                self.character_position = cell_pos
+            if cell_content == Cell.DOWNSTAIRS:
+                self.stairs_position = cell_pos

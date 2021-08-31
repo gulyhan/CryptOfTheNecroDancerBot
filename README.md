@@ -16,3 +16,4 @@ Using Python, this project requires to have as pip packages:
 
 The computer vision part is based on the [Youtube playlist of "Learn Code by Gaming"](https://youtube.com/playlist?list=PL1m2M8LQlzfKtkKq2lK5xko4X-8EZzFPI).
 Plus, online help links can be found in the code.
+The path finding part is base on ["Path Planning - A* (A-Star)"](https://youtu.be/icZj67PTFhc) video from javidx9.

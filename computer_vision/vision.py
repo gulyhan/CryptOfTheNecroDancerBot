@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
 # opencv doc : https://docs.opencv.org/4.5.3/index.html
-from hsv_filter import HsvFilter
+from computer_vision.hsv_filter import HsvFilter
 
 CELL_WIDTH_IN_PIXELS = 72
 CELL_HEIGHT_IN_PIXELS = 72
