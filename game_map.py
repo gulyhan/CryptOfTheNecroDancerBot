@@ -1,7 +1,5 @@
 from enum import Enum
 
-from numpy import broadcast
-
 class Cell(Enum):
     EMPTY = " "
     CHARACTER = "C"

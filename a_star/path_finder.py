@@ -1,7 +1,7 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from math import sqrt
 from a_star.node import Node
-import sys
-sys.path.append('../')
 from game_map import GameMap, Cell
 
 
@@ -51,7 +51,7 @@ class PathFinder:
 
 
     def set_obstacle(self, obstacle_pos):
-        self.nodes[obstacle_pos[1] * self.mapWidth + obstacle_pos[1]].bObstacle = True 
+        self.nodes[obstacle_pos[1] * self.mapWidth + obstacle_pos[0]].bObstacle = True 
 
 
     def get_shortest_path_node_iterator(self):
@@ -88,9 +88,12 @@ class PathFinder:
         
         def distance(node_a, node_b):
             return sqrt((node_a.x - node_b.x)**2 + (node_a.y - node_b.y)**2)
+
+        def distance_manhattan(node_a, node_b):
+            return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
                 
         def heuristic(node_a, node_b):
-            return distance(node_a, node_b)                
+            return distance_manhattan(node_a, node_b)                
 
         # Init current node
         node_cur = self.node_start
@@ -149,6 +152,16 @@ if __name__ == "__main__":
     start = (0, 0)
     end = (9, 9)
     path_finder.set_start_end(start, end)
+    osbtacles = [(0, 1), (1, 1), (2, 3), (3, 3), (4, 2), (5, 1), (6, 0)]
+    for obs in osbtacles:
+        path_finder.set_obstacle(obs)
     path_finder.solve_astar()
+    game = GameMap(10, 10)
     for node in path_finder.get_shortest_path_node_iterator():
         print(node)
+        game.setCell((node.x, node.y), Cell.CHARACTER)
+    game.setCell(start, Cell.CHARACTER)
+    game.setCell(end, Cell.DOWNSTAIRS)
+    for obs in osbtacles:
+       game.setCell(obs, Cell.WALL) 
+    print(game)

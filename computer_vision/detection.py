@@ -1,11 +1,9 @@
-import cv2 as cv
 from threading import Thread, Lock
 
 from computer_vision.vision import Vision
 from computer_vision.hsv_filter import HsvFilter
 
 # Constants
-
 STAIRS_HSV_FILTER = HsvFilter(3, 63, 41, 19, 159, 211, 0, 0, 0, 0)
 WALL_HSV_FILTER = HsvFilter(0, 100, 0, 31, 210, 240, 0, 0, 0, 0)
 
@@ -61,10 +59,11 @@ class Detection:
                 # Objets detection
                 ch_rectangles = self.vision_character.find(self.screenshot, 0.50)
                 # print("Rectangle character:", ch_rectangles)
-                ds_rectangles = self.vision_downstairs.find(self.screenshot, 0.50, max_results=15)
+                ds_rectangles = self.vision_downstairs.find(self.screenshot, 0.50, max_results=1)
                 # print("Rectangle downstairs: ", ds_rectangles)
-                wa_rectangles = self.vision_wall.find(processed_image_for_wall, 0.40, max_results=10)
+                wa_rectangles = self.vision_wall.find(processed_image_for_wall, 0.40, max_results=100)
 
+                # Lock the thread while updating the results
                 self.lock.acquire()
                 self.character_rectangles = ch_rectangles
                 self.downstairs_rectangles = ds_rectangles
