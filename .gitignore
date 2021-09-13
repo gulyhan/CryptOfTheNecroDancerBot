@@ -130,4 +130,5 @@ dmypy.json
 
 # Customs files
 /img/game_analysis
+/img/matchTemplate_haystacks
 /img/save
